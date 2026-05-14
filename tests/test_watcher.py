@@ -103,3 +103,12 @@ def test_raises_when_no_baseline(tmp_dir, baseline_snapshot):
     watcher = SchemaWatcher(cfg)
     with pytest.raises(FileNotFoundError, match="missing"):
         watcher.watch(lambda: baseline_snapshot)
+
+
+def test_drift_report_contains_expected_table(watcher_with_baseline):
+    """Verify that the drift report references the table where drift occurred."""
+    changed = make_snapshot({"users": ["id"]})  # email column removed
+    result = watcher_with_baseline.watch(lambda: changed)
+    assert len(result.reports) == 1
+    report = result.reports[0]
+    assert "users" in report.changes
