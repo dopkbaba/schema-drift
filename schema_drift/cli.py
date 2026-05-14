@@ -12,9 +12,26 @@ from schema_drift.reporter import DriftReporter
 
 
 def load_snapshot(path: str) -> DatabaseSnapshot:
-    """Load a DatabaseSnapshot from a JSON file."""
-    with open(path, "r", encoding="utf-8") as fh:
-        data = json.load(fh)
+    """Load a DatabaseSnapshot from a JSON file.
+
+    Args:
+        path: Path to the JSON file containing the snapshot data.
+
+    Returns:
+        A DatabaseSnapshot instance populated from the file.
+
+    Raises:
+        SystemExit: If the file cannot be read or parsed as valid JSON.
+    """
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except FileNotFoundError:
+        print(f"error: snapshot file not found: {path}", file=sys.stderr)
+        sys.exit(2)
+    except json.JSONDecodeError as exc:
+        print(f"error: invalid JSON in {path}: {exc}", file=sys.stderr)
+        sys.exit(2)
     return DatabaseSnapshot.from_dict(data)
 
 
