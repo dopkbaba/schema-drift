@@ -49,6 +49,10 @@ class LintResult:
             "warnings": [w.to_dict() for w in self.warnings],
         }
 
+    def warnings_for_table(self, table_name: str) -> List[LintWarning]:
+        """Return all warnings that belong to the given table."""
+        return [w for w in self.warnings if w.table == table_name]
+
 
 def lint_snapshot(snapshot: SchemaSnapshot) -> LintResult:
     """Run all lint checks against a snapshot and return a LintResult."""
